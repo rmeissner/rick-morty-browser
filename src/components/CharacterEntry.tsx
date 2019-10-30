@@ -20,6 +20,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         color: '#65A7C5',
     },
+    status: {
+        marginRight:16,
+        marginLeft: 16,
+        fontSize: 12,
+        alignItems: 'center',
+        color: '#65A7C5',
+    },
     image: {
         width: 48,
         height: 48,
@@ -34,7 +41,10 @@ export const CharacterEntryComponent = (props: PropsType) => {
     return (
         <View style={styles.container}>
             <Image source={{uri: props.character.imageUrl}} style={styles.image} />
-            <Text style={styles.title}>{props.character.name}</Text>
+            <View>
+                <Text style={styles.title}>{props.character.name}</Text>
+                <Text style={styles.status}>{props.character.status}</Text>
+            </View>
         </View>
     )
 }

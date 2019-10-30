@@ -18,7 +18,7 @@ import { charactersInfoSelector, moreCharactersAction, refreshCharactersAction, 
 import { Character, CharactersInfo } from '../store/models';
 import { CharacterEntryComponent } from './CharacterEntry';
 import { LoadingState } from '../store/models/list';
-import { tsImportEqualsDeclaration } from '@babel/types';
+import { tsImportEqualsDeclaration, isTemplateElement } from '@babel/types';
 
 const styles = StyleSheet.create({
   container: {
@@ -70,7 +70,7 @@ class AppModel extends React.Component<PropsType> {
         <FlatList
           style={styles.list}
           data={this.props.charactersInfo.characters}
-          keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(item, _) => item.id.toString()}
           refreshControl={
             <RefreshControl
               refreshing={this.props.loadingState.refreshing}
