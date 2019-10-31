@@ -8,17 +8,16 @@ import { connect } from "react-redux";
 import {
   FlatList,
   StyleSheet,
-  TextInput,
   View,
   RefreshControl,
   ActivityIndicator
 } from 'react-native';
 import { StateType } from '../store/state';
 import { charactersInfoSelector, moreCharactersAction, refreshCharactersAction, loadingStateSelector } from '../store/adapters';
-import { Character, CharactersInfo } from '../store/models';
+import { CharactersInfo } from '../store/models';
 import { CharacterEntryComponent } from './CharacterEntry';
 import { LoadingState } from '../store/models/list';
-import { tsImportEqualsDeclaration, isTemplateElement } from '@babel/types';
+import TopSearch from './Search';
 
 const styles = StyleSheet.create({
   container: {
@@ -30,6 +29,7 @@ const styles = StyleSheet.create({
     padding: 16
   },
   list: {
+    paddingTop: 64,
     alignSelf: 'stretch'
   }
 });
@@ -37,17 +37,21 @@ const styles = StyleSheet.create({
 type PropsType = {
   charactersInfo: CharactersInfo,
   loadingState: LoadingState,
-  dispatchRefresh: () => void,
+  dispatchRefresh: (filter: string) => void,
   dispatchLoadMore: (next: string) => void
 };
 class AppModel extends React.Component<PropsType> {
   componentDidMount() {
-    this.props.dispatchRefresh()
+    this.props.dispatchRefresh("")
+  }
+
+  search = (filter: string) => {
+    if (this.props.loadingState.refreshing) return
+    this.props.dispatchRefresh(filter)
   }
 
   refresh = () => {
-    if (this.props.loadingState.refreshing) return
-    this.props.dispatchRefresh()
+    this.search(this.props.charactersInfo.filter)
   }
 
   loadMore = () => {
@@ -75,12 +79,17 @@ class AppModel extends React.Component<PropsType> {
             <RefreshControl
               refreshing={this.props.loadingState.refreshing}
               onRefresh={this.refresh}
+              progressViewOffset={64}
             />
           }
           renderItem={({item}) => (<CharacterEntryComponent character={item} />)}
           onEndReachedThreshold={0.4}
           onEndReached={this.loadMore}
           ListFooterComponent={this.renderFooter} />
+        <TopSearch 
+          delay={500}
+          placeholder="Search character"
+          onChange={this.search}/>
       </View>
     );
   }

@@ -14,10 +14,12 @@ export class Character {
 
 export class CharactersInfo {
   characters: Character[];
+  filter: string;
   next: string;
 
-  constructor(characters: Character[], next: string) {
+  constructor(characters: Character[], next: string, filter: string) {
     this.characters = characters
     this.next = next
+    this.filter = filter ? filter : ""
   }
 }
