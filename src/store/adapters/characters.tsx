@@ -1,6 +1,6 @@
 import {Character, CharactersInfo} from '../models';
 import {initialState, StateType} from '../state';
-import {all, takeLatest, put} from 'redux-saga/effects';
+import {all, takeLatest, put, call } from 'redux-saga/effects';
 import {updateLoadingAction, updateRefreshingAction} from './list';
 
 // Layout actions -> update layout
@@ -135,7 +135,6 @@ export class CharactersSaga {
         yield put(updateLoadingAction(true));
         try {
             const response = yield this.api.loadCharactersWithUrl(action.url);
-            console.log(response)
             const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), '');
             yield put(addCharactersAction(info));
         } catch (e) {
