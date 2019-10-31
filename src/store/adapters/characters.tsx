@@ -65,28 +65,28 @@ export const charactersReducer = (
     }
 };
 
-interface ApiPageInfo {
+export interface ApiPageInfo {
     next: string;
 }
 
-interface ApiCharacter {
+export interface ApiCharacter {
     id: number;
     name: string;
     status: string;
     image: string;
 }
 
-interface ApiResponse {
+export interface ApiResponse {
     info: ApiPageInfo;
     results: ApiCharacter[];
 }
 
-interface CharactersApi {
-    loadCharactersWithFilter(url: string): Promise<ApiResponse>;
+export interface CharactersApi {
+    loadCharactersWithFilter(filter: string): Promise<ApiResponse>;
     loadCharactersWithUrl(url: string): Promise<ApiResponse>;
 }
 
-class RickAndMortyApi implements CharactersApi {
+export class RickAndMortyApi implements CharactersApi {
     baseUrl = 'https://rickandmortyapi.com/api/character/';
 
     loadCharactersWithFilter = async (filter: string): Promise<ApiResponse> => {
@@ -103,7 +103,7 @@ class RickAndMortyApi implements CharactersApi {
     };
 }
 
-class CharactersSaga {
+export class CharactersSaga {
     api: CharactersApi;
     // Inject api
     constructor(api: CharactersApi) {
@@ -123,6 +123,7 @@ class CharactersSaga {
             const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), action.filter);
             yield put(updateCharactersAction(info));
         } catch (e) {
+            console.log(e)
             // We should propagate the error and show it to the user, for now we show an empty list
             const info = new CharactersInfo([], '', action.filter);
             yield put(updateCharactersAction(info));
@@ -134,9 +135,11 @@ class CharactersSaga {
         yield put(updateLoadingAction(true));
         try {
             const response = yield this.api.loadCharactersWithUrl(action.url);
+            console.log(response)
             const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), '');
             yield put(addCharactersAction(info));
         } catch (e) {
+            console.log(e)
             // We should propagate the error and show it to the user, for now we do nothing to the user can try again
         }
         yield put(updateLoadingAction(false));
