@@ -1,2 +1,2 @@
-export * from "./character";
-export * from "./list";
+export * from './character';
+export * from './list';

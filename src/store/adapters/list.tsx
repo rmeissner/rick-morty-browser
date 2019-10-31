@@ -1,28 +1,28 @@
-import { StateType, initialState } from "../state";
-import { LoadingState } from "../models/list";
+import {StateType, initialState} from '../state';
+import {LoadingState} from '../models/list';
 
 // Layout actions -> update layout
-const UPDATE_LOADING = "list/layout/loading";
-const UPDATE_REFRESHING = "list/layout/refreshing";
+const UPDATE_LOADING = 'list/layout/loading';
+const UPDATE_REFRESHING = 'list/layout/refreshing';
 
 interface LoadingAction {
-    type: string,
-    state: boolean
+    type: string;
+    state: boolean;
 }
 
 export const updateLoadingAction = (state: boolean): LoadingAction => ({
     type: UPDATE_LOADING,
-    state
+    state,
 });
 
 export const updateRefreshingAction = (state: boolean): LoadingAction => ({
     type: UPDATE_REFRESHING,
-    state
+    state,
 });
 
-type StateSlice = StateType["loadingState"];
+type StateSlice = StateType['loadingState'];
 export const loadingStateSelector = (state: StateType): StateSlice => {
-    return state.loadingState
+    return state.loadingState;
 };
 
 export const loadingStateReducer = (
@@ -31,10 +31,10 @@ export const loadingStateReducer = (
 ): StateSlice => {
     switch (action.type) {
         case UPDATE_LOADING:
-            return new LoadingState(action.state, state.refreshing)
+            return new LoadingState(action.state, state.refreshing);
         case UPDATE_REFRESHING:
-            return new LoadingState(state.loading, action.state)
+            return new LoadingState(state.loading, action.state);
         default:
             return state;
     }
-}
+};

@@ -1,40 +1,39 @@
-import { Character, CharactersInfo } from "../models";
-import { initialState, StateType } from "../state";
-import { all, takeLatest, put } from 'redux-saga/effects'
-import { updateLoadingAction, updateRefreshingAction } from "./list";
+import {Character, CharactersInfo} from '../models';
+import {initialState, StateType} from '../state';
+import {all, takeLatest, put} from 'redux-saga/effects';
+import {updateLoadingAction, updateRefreshingAction} from './list';
 
 // Layout actions -> update layout
-const UPDATE_CHARACTERS = "characters/layout/update";
-const ADD_CHARACTERS = "characters/layout/add";
+const UPDATE_CHARACTERS = 'characters/layout/update';
+const ADD_CHARACTERS = 'characters/layout/add';
 
 export interface CharactersAction {
-    type: string,
-    info: CharactersInfo
+    type: string;
+    info: CharactersInfo;
 }
 
 export const updateCharactersAction = (info: CharactersInfo): CharactersAction => ({
     type: UPDATE_CHARACTERS,
-    info
+    info,
 });
 
 export const addCharactersAction = (info: CharactersInfo): CharactersAction => ({
     type: ADD_CHARACTERS,
-    info
+    info,
 });
 
-
 // Data actions -> update state
-const REFRESH_CHARACTERS = "characters/data/refresh";
-const MORE_CHARACTERS = "characters/data/more";
+const REFRESH_CHARACTERS = 'characters/data/refresh';
+const MORE_CHARACTERS = 'characters/data/more';
 
 interface RefreshCharactersAction {
-  type: string,
-  filter: string,
+    type: string;
+    filter: string;
 }
 
 interface LoadCharactersAction {
-  type: string,
-  url: string,
+    type: string;
+    url: string;
 }
 
 export const refreshCharactersAction = (filter: string): RefreshCharactersAction => ({
@@ -47,9 +46,9 @@ export const moreCharactersAction = (url: string): LoadCharactersAction => ({
     url: url,
 });
 
-type StateSlice = StateType["charactersInfo"];
+type StateSlice = StateType['charactersInfo'];
 export const charactersInfoSelector = (state: StateType): StateSlice => {
-    return state.charactersInfo
+    return state.charactersInfo;
 };
 
 export const charactersReducer = (
@@ -58,99 +57,98 @@ export const charactersReducer = (
 ): StateSlice => {
     switch (action.type) {
         case ADD_CHARACTERS:
-            return new CharactersInfo(state.characters.concat(action.info.characters), action.info.next, state.filter)
+            return new CharactersInfo(state.characters.concat(action.info.characters), action.info.next, state.filter);
         case UPDATE_CHARACTERS:
-            return action.info
+            return action.info;
         default:
             return state;
     }
-}
+};
 
 interface ApiPageInfo {
-    next: string
+    next: string;
 }
 
 interface ApiCharacter {
-    id: number,
-    name: string,
-    status: string,
-    image: string,
+    id: number;
+    name: string;
+    status: string;
+    image: string;
 }
 
 interface ApiResponse {
-    info: ApiPageInfo
-    results: ApiCharacter[]
+    info: ApiPageInfo;
+    results: ApiCharacter[];
 }
 
 interface CharactersApi {
-    loadCharactersWithFilter(url: string): Promise<ApiResponse>
-    loadCharactersWithUrl(url: string): Promise<ApiResponse>
+    loadCharactersWithFilter(url: string): Promise<ApiResponse>;
+    loadCharactersWithUrl(url: string): Promise<ApiResponse>;
 }
 
 class RickAndMortyApi implements CharactersApi {
+    baseUrl = 'https://rickandmortyapi.com/api/character/';
 
-    baseUrl: string = "https://rickandmortyapi.com/api/character/"
+    loadCharactersWithFilter = async (filter: string): Promise<ApiResponse> => {
+        const url = filter.trim().length == 0 ? this.baseUrl : this.baseUrl + '?name=' + filter;
+        return this.loadCharactersWithUrl(url);
+    };
 
-    loadCharactersWithFilter = async (filter: string): Promise<ApiResponse>  => {
-        const url = filter.trim().length == 0 ? this.baseUrl : this.baseUrl + "?name=" + filter 
-        return this.loadCharactersWithUrl(url)
-    }
-
-    loadCharactersWithUrl = async (url: string): Promise<ApiResponse>  => {
-        const resp = await fetch(url)
+    loadCharactersWithUrl = async (url: string): Promise<ApiResponse> => {
+        const resp = await fetch(url);
         // Throw error depending on status (e.g. 404 -> NoResultsException)
-        if (!resp.ok) throw new Error("Request failed")
-        const data: ApiResponse = await resp.json()
-        return data
-    }
+        if (!resp.ok) throw new Error('Request failed');
+        const data: ApiResponse = await resp.json();
+        return data;
+    };
 }
 
 class CharactersSaga {
-    api: CharactersApi
+    api: CharactersApi;
     // Inject api
-    constructor (api: CharactersApi) {
-        this.api = api
+    constructor(api: CharactersApi) {
+        this.api = api;
     }
 
-    mapNext = (response: ApiResponse): string => response.info.next
+    mapNext = (response: ApiResponse): string => response.info.next;
 
     mapCharacters = (response: ApiResponse): Character[] => {
-        return response.results.map(c => new Character(c.id, c.name, c.status, c.image))
-    }
+        return response.results.map(c => new Character(c.id, c.name, c.status, c.image));
+    };
 
-    * refreshCharactersSaga(action: RefreshCharactersAction) {
-        yield put(updateRefreshingAction(true))
+    *refreshCharactersSaga(action: RefreshCharactersAction) {
+        yield put(updateRefreshingAction(true));
         try {
-            const response = yield this.api.loadCharactersWithFilter(action.filter)
-            const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), action.filter)
-            yield put(updateCharactersAction(info))
+            const response = yield this.api.loadCharactersWithFilter(action.filter);
+            const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), action.filter);
+            yield put(updateCharactersAction(info));
         } catch (e) {
             // We should propagate the error and show it to the user, for now we show an empty list
-            const info = new CharactersInfo([], "", action.filter)
-            yield put(updateCharactersAction(info))
+            const info = new CharactersInfo([], '', action.filter);
+            yield put(updateCharactersAction(info));
         }
-        yield put(updateRefreshingAction(false))
+        yield put(updateRefreshingAction(false));
     }
-    
-    * loadMoreCharactersSaga(action: LoadCharactersAction) {
-        yield put(updateLoadingAction(true))
+
+    *loadMoreCharactersSaga(action: LoadCharactersAction) {
+        yield put(updateLoadingAction(true));
         try {
-            const response = yield this.api.loadCharactersWithUrl(action.url)
-            const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), "")
-            yield put(addCharactersAction(info))
-        } catch(e) {
+            const response = yield this.api.loadCharactersWithUrl(action.url);
+            const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), '');
+            yield put(addCharactersAction(info));
+        } catch (e) {
             // We should propagate the error and show it to the user, for now we do nothing to the user can try again
         }
-        yield put(updateLoadingAction(false))
+        yield put(updateLoadingAction(false));
     }
 }
 
-const api = new RickAndMortyApi()
-const saga = new CharactersSaga(api)
+const api = new RickAndMortyApi();
+const saga = new CharactersSaga(api);
 
 export function* charactersSaga() {
     yield all([
-        takeLatest(REFRESH_CHARACTERS, saga.refreshCharactersSaga.bind(saga)), 
-        takeLatest(MORE_CHARACTERS, saga.loadMoreCharactersSaga.bind(saga))
-    ])
+        takeLatest(REFRESH_CHARACTERS, saga.refreshCharactersSaga.bind(saga)),
+        takeLatest(MORE_CHARACTERS, saga.loadMoreCharactersSaga.bind(saga)),
+    ]);
 }

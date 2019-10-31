@@ -1,28 +1,25 @@
-import { applyMiddleware, combineReducers, createStore } from "redux";
-import createSagaMiddleware from "redux-saga";
-import { all } from 'redux-saga/effects'
-import { charactersSaga, charactersReducer, loadingStateReducer } from "./adapters";
+import {applyMiddleware, combineReducers, createStore} from 'redux';
+import createSagaMiddleware from 'redux-saga';
+import {all} from 'redux-saga/effects';
+import {charactersSaga, charactersReducer, loadingStateReducer} from './adapters';
 
 const rootReducer = {
-  charactersInfo: charactersReducer,
-  loadingState: loadingStateReducer
+    charactersInfo: charactersReducer,
+    loadingState: loadingStateReducer,
 };
 
 function* rootSaga() {
-    yield all([charactersSaga()])
+    yield all([charactersSaga()]);
 }
 
 export const configureStore = () => {
-  const middleware = [];
-  const sagaMiddleware = createSagaMiddleware();
+    const middleware = [];
+    const sagaMiddleware = createSagaMiddleware();
 
-  middleware.push(sagaMiddleware);
+    middleware.push(sagaMiddleware);
 
-  const store = createStore(
-    combineReducers(rootReducer),
-    applyMiddleware(...middleware),
-  );
+    const store = createStore(combineReducers(rootReducer), applyMiddleware(...middleware));
 
-  sagaMiddleware.run(rootSaga);
-  return store;
+    sagaMiddleware.run(rootSaga);
+    return store;
 };
