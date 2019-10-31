@@ -6,6 +6,6 @@ export interface StateType {
 }
 
 export const initialState: StateType = {
-    charactersInfo: new CharactersInfo([], ""),
+    charactersInfo: new CharactersInfo([], "", ""),
     loadingState: new LoadingState(false, false)
 };

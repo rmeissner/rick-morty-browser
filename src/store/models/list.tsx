@@ -3,7 +3,7 @@ export class LoadingState {
     refreshing: boolean;
 
     constructor(loading: boolean, refreshing: boolean) {
-    this.loading = loading
-    this.refreshing = refreshing
+        this.loading = loading
+        this.refreshing = refreshing
     }
 }
