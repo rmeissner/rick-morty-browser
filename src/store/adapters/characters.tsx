@@ -98,6 +98,7 @@ class RickAndMortyApi implements CharactersApi {
 
     loadCharactersWithUrl = async (url: string): Promise<ApiResponse>  => {
         const resp = await fetch(url)
+        // Throw error depending on status (e.g. 404 -> NoResultsException)
         if (!resp.ok) throw new Error("Request failed")
         const data: ApiResponse = await resp.json()
         return data
