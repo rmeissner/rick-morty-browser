@@ -1,6 +1,6 @@
 import {Character, CharactersInfo} from '../models';
 import {initialState, StateType} from '../state';
-import {all, takeLatest, put, call } from 'redux-saga/effects';
+import {all, takeLatest, put, call} from 'redux-saga/effects';
 import {updateLoadingAction, updateRefreshingAction} from './list';
 
 // Layout actions -> update layout
@@ -123,7 +123,7 @@ export class CharactersSaga {
             const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), action.filter);
             yield put(updateCharactersAction(info));
         } catch (e) {
-            console.log(e)
+            console.log(e);
             // We should propagate the error and show it to the user, for now we show an empty list
             const info = new CharactersInfo([], '', action.filter);
             yield put(updateCharactersAction(info));
@@ -138,7 +138,7 @@ export class CharactersSaga {
             const info = new CharactersInfo(this.mapCharacters(response), this.mapNext(response), '');
             yield put(addCharactersAction(info));
         } catch (e) {
-            console.log(e)
+            console.log(e);
             // We should propagate the error and show it to the user, for now we do nothing to the user can try again
         }
         yield put(updateLoadingAction(false));
